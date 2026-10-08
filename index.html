@@ -3,15 +3,14 @@
   PETMATCH QUIZ — VERSÃO SIMPLES (estudo)
   Este arquivo é a ESTRUTURA da página. O visual está em style.css
   e a lógica (perguntas, pontuação, telas) está em script.js.
-  Abra este arquivo pelo link /simples/index.html para ter também
-  estatísticas e o resumo com IA — mas ele funciona até aberto
-  direto no navegador (aí só o quiz roda, sem salvar nada).
+  Não depende de servidor nem de internet: funciona aberto direto
+  no navegador (clique duplo no index.html).
 ============================================================ -->
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PetMatch Quiz — Versão simples (HTML/CSS/JS)</title>
+    <title>PetMatch Quiz — Descubra o pet ideal para você</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -22,16 +21,18 @@
     </header>
 
     <main>
-      <!-- TELA 1: INÍCIO (com as estatísticas reais do banco) -->
+      <!-- TELA 1: INÍCIO -->
       <section id="tela-inicio">
-        <h1>Descubra qual pet combina com o seu estilo de vida</h1>
+        <span class="etiqueta">✨ 8 perguntas · 2 minutos · 100% grátis</span>
+        <h1>Descubra qual pet combina com o seu <strong>estilo de vida</strong></h1>
         <p class="subtitulo">
-          Responda 8 perguntas rápidas e veja o pet ideal para você e sua família.
+          Tempo livre, espaço, família e orçamento: responda e receba o pet ideal para você,
+          com ranking de compatibilidade e dicas de cuidado.
         </p>
-        <button id="botao-comecar">Começar o quiz agora</button>
+        <button id="botao-comecar">Começar o quiz agora →</button>
 
-        <h2>Estatísticas da comunidade</h2>
-        <div id="estatisticas">Carregando...</div>
+        <h2>Conheça os candidatos 🐾</h2>
+        <div id="animais" class="grade-animais"></div>
       </section>
 
       <!-- TELA 2: PERGUNTAS -->
@@ -39,33 +40,47 @@
         <p id="indicador-pergunta"></p>
         <div class="barra-progresso"><div id="barra"></div></div>
         <h2 id="titulo-pergunta"></h2>
-        <p id="subtitulo-pergunta" class="subtitulo"></p>
         <div id="opcoes"></div>
-        <button id="botao-voltar">← Voltar</button>
+        <button id="botao-voltar" class="secundario">← Voltar</button>
       </section>
 
       <!-- TELA 3: RESULTADO -->
       <section id="tela-resultado" class="oculto">
         <div id="podio"></div>
 
-        <h3>Por que esse pet é o ideal para você?</h3>
-        <p id="resumo-ia" class="card-resumo">Gerando seu resumo personalizado...</p>
+        <h3>Por que esse pet combina com você</h3>
+        <ul id="motivos" class="card-motivos"></ul>
 
         <h3>Seu nível de afinidade</h3>
         <div id="barras-afinidade"></div>
 
         <h3>Como cuidar bem dele</h3>
-        <ul id="dicas"></ul>
+        <ul id="dicas" class="lista-dicas"></ul>
 
-        <button id="botao-refazer" class="secundario">Refazer o quiz</button>
+        <div class="acoes">
+          <button id="botao-compartilhar">Compartilhar 💬</button>
+          <button id="botao-refazer" class="secundario">Refazer o quiz</button>
+        </div>
       </section>
     </main>
 
+    <!-- RODAPÉ -->
     <footer>
-      <p>
+      <div class="rodape-topo">
+        <div>
+          <p class="logo">🐾 PetMatch</p>
+          <p class="rodape-frase">Guarda responsável e a conexão entre famílias e animais.</p>
+        </div>
+        <nav class="rodape-links">
+          <a href="#" id="link-inicio">Início</a>
+          <a href="#" id="link-quiz">Fazer o quiz</a>
+        </nav>
+      </div>
+      <p class="rodape-aviso">
         Ferramenta educativa de guarda responsável — antes de adotar, consulte um médico
-        veterinário. Feito com HTML, CSS e JavaScript puros.
+        veterinário e ONGs de proteção animal.
       </p>
+      <p class="rodape-copia">© 2026 PetMatch · Feito com HTML, CSS e JavaScript puros.</p>
     </footer>
 
     <script src="script.js"></script>
