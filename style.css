@@ -1,7 +1,8 @@
 /* ============================================================
    PETMATCH QUIZ — VERSÃO SIMPLES (estudo)
    Visual da página: paleta quente (terracota + âmbar sobre creme).
-   As classes espelham os elementos criados pelo script.js.
+   As classes espelham os elementos criados pelo index.html e script.js.
+   Ordem: base → cabeçalho → botões → telas → quiz → resultado → rodapé.
 ============================================================ */
 
 /* ---- Paleta e base ---- */
@@ -10,8 +11,10 @@
   --texto: #1e293b;
   --texto-fraco: #64748b;
   --terracota: #e05a36;
+  --terracota-escura: #c2410c;
   --ambar: #fef3c7;
   --borda: #f0e6d6;
+  --sombra: 0 10px 30px rgba(30, 41, 59, 0.08);
 }
 
 * {
@@ -31,28 +34,35 @@ h2,
 h3 {
   line-height: 1.2;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+h2,
+h3 {
+  margin-top: 2rem;
 }
 
 .oculto {
   display: none;
 }
 
-/* ---- Cabeçalho e rodapé ---- */
+/* ---- Cabeçalho ---- */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background: #ffffffdd;
+  background: rgba(255, 255, 255, 0.85);
   border-bottom: 1px solid var(--borda);
   position: sticky;
   top: 0;
-  backdrop-filter: blur(6px);
+  z-index: 10;
+  backdrop-filter: blur(8px);
 }
 
 .logo {
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 .versao {
@@ -60,20 +70,11 @@ header {
   color: var(--texto-fraco);
 }
 
-footer {
-  margin-top: 3rem;
-  padding: 1.5rem;
-  background: #1e293b;
-  color: #cbd5e1;
-  font-size: 0.8rem;
-  text-align: center;
-}
-
 /* ---- Blocos centrais ---- */
 main {
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 2.5rem 1rem;
+  padding: 2.5rem 1.25rem 3rem;
 }
 
 section {
@@ -83,7 +84,7 @@ section {
 @keyframes aparecer {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -93,16 +94,39 @@ section {
 
 .subtitulo {
   color: var(--texto-fraco);
-  margin-bottom: 1.5rem;
+  font-size: 1.05rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+/* Tela inicial: etiqueta + destaque do título */
+.etiqueta {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--terracota-escura);
+  box-shadow: var(--sombra);
+}
+
+#tela-inicio h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin-top: 1rem;
+}
+
+#tela-inicio h1 strong {
+  color: var(--terracota);
 }
 
 /* ---- Botões ---- */
 button {
-  background: var(--terracota);
+  background: linear-gradient(135deg, var(--terracota), #d97706);
   color: #fff;
   border: none;
   border-radius: 999px;
-  padding: 0.8rem 1.6rem;
+  padding: 0.85rem 1.8rem;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -111,7 +135,7 @@ button {
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(224, 90, 54, 0.3);
+  box-shadow: 0 10px 24px rgba(224, 90, 54, 0.35);
 }
 
 button:active {
@@ -123,7 +147,6 @@ button.secundario,
   background: #fff;
   color: var(--terracota);
   border: 2px solid var(--terracota);
-  margin-top: 1rem;
 }
 
 #botao-voltar:disabled {
@@ -133,18 +156,28 @@ button.secundario,
   box-shadow: none;
 }
 
+.acoes {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
 /* ---- Quiz: progresso e opções ---- */
 #indicador-pergunta {
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--texto-fraco);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .barra-progresso {
-  height: 8px;
+  height: 10px;
   background: var(--ambar);
   border-radius: 999px;
-  margin: 0.5rem 0 1.5rem;
+  margin: 0.6rem 0 1.75rem;
   overflow: hidden;
 }
 
@@ -167,27 +200,91 @@ button.secundario,
   color: var(--texto);
   text-align: left;
   border: 2px solid var(--borda);
-  border-radius: 1rem;
+  border-radius: 1.1rem;
   padding: 1rem 1.2rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.opcao-emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  background: var(--ambar);
+  border-radius: 0.8rem;
+  font-size: 1.2rem;
 }
 
 .opcao:hover {
   border-color: var(--terracota);
-  box-shadow: 0 8px 20px rgba(224, 90, 54, 0.15);
+  box-shadow: var(--sombra);
+}
+
+.opcao:hover .opcao-emoji {
+  background: #fff;
+}
+
+/* ---- Grade de pets da tela inicial ---- */
+.grade-animais {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.9rem;
+}
+
+.cartao-animais {
+  border-radius: 1.2rem;
+  padding: 1.2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cartao-animais:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sombra);
+}
+
+.emoji-animais {
+  font-size: 2.2rem;
+}
+
+.frase-animais {
+  font-size: 0.82rem;
+  color: var(--texto-fraco);
 }
 
 /* ---- Resultado ---- */
 .vencedor {
   text-align: center;
   border: 2px solid var(--ambar);
-  border-radius: 1.5rem;
-  padding: 2rem 1rem;
+  border-radius: 1.6rem;
+  padding: 2.25rem 1.25rem;
+  box-shadow: var(--sombra);
+}
+
+.confete {
+  font-size: 1.6rem;
+}
+
+.faixa {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--terracota-escura);
 }
 
 .emoji-grande {
-  font-size: 4rem;
+  font-size: 4.5rem;
   display: block;
+  margin: 0.4rem 0;
   animation: flutuar 3s ease-in-out infinite;
 }
 
@@ -197,48 +294,73 @@ button.secundario,
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
 }
 
 .selo {
   display: inline-block;
-  margin-top: 0.75rem;
-  background: var(--terracota);
+  margin-top: 0.9rem;
+  background: linear-gradient(135deg, var(--terracota), #d97706);
   color: #fff;
-  padding: 0.5rem 1.2rem;
+  padding: 0.55rem 1.4rem;
   border-radius: 999px;
   font-weight: 800;
 }
 
 .demais {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
   margin-top: 1rem;
 }
 
 .colocado {
   background: #fff;
   border: 1px solid var(--borda);
-  border-radius: 0.8rem;
-  padding: 0.6rem 1rem;
+  border-radius: 1.1rem;
+  padding: 1rem;
   font-weight: 600;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.card-resumo {
+.medalha {
+  font-size: 1.3rem;
+}
+
+.emoji-medio {
+  font-size: 1.6rem;
+}
+
+.pontos-colocado {
+  color: var(--texto-fraco);
+  font-weight: 800;
+}
+
+.card-motivos {
   background: #f5f3ff;
   border: 1px solid #ddd6fe;
-  border-radius: 1rem;
-  padding: 1rem 1.2rem;
+  border-radius: 1.1rem;
+  padding: 1rem 1.25rem 1rem 1rem;
+  list-style: none;
 }
 
-/* ---- Barras (afinidade e estatísticas) ---- */
+.card-motivos li {
+  padding: 0.35rem 0;
+  font-size: 0.95rem;
+}
+
+/* ---- Barras (afinidade) ---- */
 .linha {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin: 0.6rem 0;
+  margin: 0.65rem 0;
 }
 
 .nome {
@@ -250,7 +372,7 @@ button.secundario,
 
 .trilha {
   flex: 1;
-  height: 10px;
+  height: 12px;
   background: var(--ambar);
   border-radius: 999px;
   overflow: hidden;
@@ -263,30 +385,94 @@ button.secundario,
 }
 
 .valor {
-  width: 44px;
+  width: 48px;
   text-align: right;
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.est-total {
-  margin-bottom: 0.75rem;
-  color: var(--texto-fraco);
-}
-
-#dicas {
+/* ---- Dicas ---- */
+.lista-dicas {
   padding-left: 0;
   list-style: none;
 }
 
-#dicas li {
-  margin: 0.4rem 0;
+.lista-dicas li {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 0.9rem;
+  padding: 0.7rem 1rem;
+  margin: 0.5rem 0;
   font-size: 0.95rem;
 }
 
-@media (max-width: 480px) {
+/* ---- Rodapé ---- */
+footer {
+  margin-top: 3rem;
+  background: #1e293b;
+  color: #cbd5e1;
+  padding: 2.5rem 1.5rem 1.75rem;
+}
+
+.rodape-topo {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+footer .logo {
+  color: #fff;
+}
+
+.rodape-frase {
+  font-size: 0.9rem;
+  max-width: 320px;
+}
+
+.rodape-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.rodape-links a {
+  color: #fbbf24;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.rodape-links a:hover {
+  text-decoration: underline;
+}
+
+.rodape-aviso {
+  max-width: 720px;
+  margin: 1.5rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.rodape-copia {
+  max-width: 720px;
+  margin: 0.35rem auto 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* ---- Responsivo e acessibilidade ---- */
+@media (max-width: 560px) {
   .nome {
     width: 96px;
+  }
+
+  .demais {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -296,4 +482,3 @@ button.secundario,
     transition: none !important;
   }
 }
-
