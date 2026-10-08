@@ -4,6 +4,7 @@
 //   1. DADOS      — os 6 pets e as 8 perguntas (com pontos de cada opção)
 //   2. PONTUAÇÃO  — como o "match" é calculado
 //   3. TELAS      — o que mostrar na página conforme o clique
+// Não há chamadas à internet: tudo roda no próprio navegador.
 // ============================================================
 
 // ---------- 1. DADOS ----------
@@ -139,6 +140,7 @@ function calcularScores(respostas) {
 const $ = (id) => document.getElementById(id);
 let respostas = {};
 let indice = 0;
+let ultimoPlacar = null; // guardado para o botão "Compartilhar"
 
 function mostrarTela(tela) {
   for (const t of ["tela-inicio", "tela-perguntas", "tela-resultado"]) {
@@ -165,7 +167,7 @@ function mostrarPergunta() {
   p.opcoes.forEach((opcao) => {
     const botao = document.createElement("button");
     botao.className = "opcao";
-    botao.textContent = opcao.emoji + " " + opcao.rotulo;
+    botao.innerHTML = `<span class="opcao-emoji">${opcao.emoji}</span> ${opcao.rotulo}`;
     botao.onclick = () => escolherOpcao(opcao.id);
     container.appendChild(botao);
   });
@@ -183,107 +185,96 @@ function escolherOpcao(idOpcao) {
 }
 
 function mostrarResultado(placar) {
+  ultimoPlacar = placar;
   const vencedor = placar[0];
   const info = PETS[vencedor.pet];
 
-  // Pódio: 1º lugar em destaque + 2º e 3º
+  // Pódio: 1º lugar em destaque + 2º e 3º lado a lado
+  const colocados = placar.slice(1, 3);
   $("podio").innerHTML = `
     <div class="vencedor" style="background:${info.fundo}">
-      <span class="emoji-grande">🎉 ${info.emoji}</span>
+      <span class="confete">🎉</span>
+      <p class="faixa">Seu par perfeito</p>
+      <span class="emoji-grande">${info.emoji}</span>
       <h2>${info.nome}</h2>
       <p>${info.frase}</p>
       <p class="selo">${vencedor.porcentagem}% de compatibilidade</p>
     </div>
-    ${placar.slice(1, 3).map((s, i) => `<div class="colocado">${i === 0 ? "🥈 2º" : "🥉 3º"} — ${PETS[s.pet].emoji} ${PETS[s.pet].nome}: ${s.porcentagem}%</div>`).join("")}`;
+    <div class="demais">
+      ${colocados
+        .map(
+          (s, i) => `<div class="colocado">
+            <span class="medalha">${i === 0 ? "🥈" : "🥉"}</span>
+            <span class="emoji-medio">${PETS[s.pet].emoji}</span>
+            <strong>${PETS[s.pet].nome}</strong>
+            <span class="pontos-colocado">${s.porcentagem}%</span>
+          </div>`
+        )
+        .join("")}
+    </div>`;
 
-  // Barras de afinidade com os 6 pets
+  // Barras de afinidade: nasce com largura 0 e anima até o valor final
   $("barras-afinidade").innerHTML = placar
     .map(
       (s) => `<div class="linha">
         <span class="nome">${PETS[s.pet].emoji} ${PETS[s.pet].nome}</span>
-        <div class="trilha"><div class="preenchimento" style="width:${s.porcentagem}%;background:${PETS[s.pet].cor}"></div></div>
+        <div class="trilha"><div class="preenchimento" style="width:0;background:${PETS[s.pet].cor}"></div></div>
         <span class="valor">${s.porcentagem}%</span>
       </div>`
     )
     .join("");
+  setTimeout(() => {
+    document.querySelectorAll("#barras-afinidade .preenchimento").forEach((barra, i) => {
+      barra.style.width = placar[i].porcentagem + "%";
+    });
+  }, 100);
+
+  // Motivos: as 3 respostas em que o vencedor pontuou mais
+  const motivos = PERGUNTAS.map((pergunta) => {
+    const opcao = pergunta.opcoes.find((o) => o.id === respostas[pergunta.id]);
+    return { titulo: pergunta.titulo, resposta: opcao.rotulo, pontos: opcao.pontos[vencedor.pet] ?? 0 };
+  })
+    .filter((m) => m.pontos > 0)
+    .sort((a, b) => b.pontos - a.pontos)
+    .slice(0, 3);
+  $("motivos").innerHTML = motivos.length
+    ? motivos.map((m) => `<li>🐾 <strong>${m.titulo}</strong> — sua resposta: ${m.resposta}</li>`).join("")
+    : "<li>Seu perfil é bem equilibrado — qualquer companhia calma combina com você!</li>";
 
   $("dicas").innerHTML = info.dicas.map((d) => `<li>✅ ${d}</li>`).join("");
 
-  $("resumo-ia").textContent = "Gerando seu resumo personalizado...";
-  pedirResumoIA(placar);
-  salvarResultado(placar);
   mostrarTela("tela-resultado");
 }
 
-// ----- Falas com o servidor (opcional: só funcionam com o site no ar) -----
+// ----- Grade de pets da tela inicial e rodapé -----
+$("animais").innerHTML = Object.values(PETS)
+  .map(
+    (pet) => `<div class="cartao-animais" style="background:${pet.fundo}">
+      <span class="emoji-animais">${pet.emoji}</span>
+      <strong>${pet.nome}</strong>
+      <span class="frase-animais">${pet.frase}</span>
+    </div>`
+  )
+  .join("");
 
-// Resumo escrito por IA, chegando em pedaços (streaming)
-async function pedirResumoIA(placar) {
-  // Converte as respostas em texto que a IA entende
-  const legiveis = {};
-  for (const p of PERGUNTAS) {
-    const opcao = p.opcoes.find((o) => o.id === respostas[p.id]);
-    if (opcao) legiveis[p.titulo] = opcao.rotulo;
-  }
-  try {
-    const resposta = await fetch("/api/quiz/summary", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ top_pet: placar[0].pet, respostas: legiveis }),
-    });
-    if (!resposta.ok) throw new Error();
-    const leitor = resposta.body.getReader();
-    const decodificador = new TextDecoder();
-    $("resumo-ia").textContent = "";
-    while (true) {
-      const { done, value } = await leitor.read();
-      if (done) break;
-      $("resumo-ia").textContent += decodificador.decode(value);
-    }
-  } catch {
-    $("resumo-ia").textContent =
-      "Resumo com IA disponível apenas no site no ar — mas o seu resultado é válido!";
-  }
-}
+$("link-inicio").onclick = (evento) => {
+  evento.preventDefault();
+  mostrarTela("tela-inicio");
+};
+$("link-quiz").onclick = (evento) => {
+  evento.preventDefault();
+  comecarQuiz();
+};
 
-// Salva o resultado para as estatísticas globais
-async function salvarResultado(placar) {
-  try {
-    await fetch("/api/quiz/results", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        top_pet: placar[0].pet,
-        scores: Object.fromEntries(placar.map((s) => [s.pet, s.pontos])),
-        respostas: Object.fromEntries(PERGUNTAS.map((p) => [p.id, respostas[p.id]])),
-      }),
-    });
-  } catch {
-    // Sem backend (arquivo aberto direto): tudo bem, o resultado continua na tela
-  }
-}
-
-// Estatísticas da tela inicial
-async function carregarEstatisticas() {
-  try {
-    const stats = await (await fetch("/api/quiz/stats")).json();
-    const linhas = Object.entries(stats.counts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([pet, qtd]) => {
-        const pct = Math.round((qtd / stats.total) * 100);
-        return `<div class="linha">
-          <span class="nome">${PETS[pet].emoji} ${PETS[pet].nome}</span>
-          <div class="trilha"><div class="preenchimento" style="width:${pct}%;background:${PETS[pet].cor}"></div></div>
-          <span class="valor">${pct}%</span>
-        </div>`;
-      })
-      .join("");
-    $("estatisticas").innerHTML =
-      `<p class="est-total"><strong>${stats.total}</strong> pessoas já descobriram seu pet ideal.</p>` + linhas;
-  } catch {
-    $("estatisticas").textContent = "As estatísticas aparecem quando o site é aberto pelo link do ar.";
-  }
-}
+// Compartilha o resultado no WhatsApp
+$("botao-compartilhar").onclick = () => {
+  const vencedor = ultimoPlacar[0];
+  const info = PETS[vencedor.pet];
+  const texto =
+    "Fiz o PetMatch Quiz e meu pet ideal é " + info.nome + " " + info.emoji +
+    " (" + vencedor.porcentagem + "% de compatibilidade). Faça o seu também!";
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
+};
 
 // ----- Liga os botões e parte do início -----
 $("botao-comecar").onclick = comecarQuiz;
@@ -292,4 +283,3 @@ $("botao-voltar").onclick = () => {
   mostrarPergunta();
 };
 $("botao-refazer").onclick = comecarQuiz;
-carregarEstatisticas();
