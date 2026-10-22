@@ -1,12 +1,3 @@
-// ============================================================
-// PETMATCH QUIZ — VERSÃO SIMPLES (estudo)
-// O arquivo tem 3 partes:
-//   1. DADOS      — os 6 pets e as 8 perguntas (com pontos de cada opção)
-//   2. PONTUAÇÃO  — como o "match" é calculado
-//   3. TELAS      — o que mostrar na página conforme o clique
-// Não há chamadas à internet: tudo roda no próprio navegador.
-// ============================================================
-
 // ---------- 1. DADOS ----------
 const PETS = {
   cachorro: {
